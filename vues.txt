@@ -1,0 +1,33 @@
+1. Expliquer à quoi sert une vue en base de données. Expliquer quelle est la différence
+entre une vue logique et une vue matérialisée.
+
+
+
+"La vue logique de la base de données est la façon dont les données apparaissent à l'utilisateur pour être stockées. ... Le stockage physique de la base de données est la manière dont les données sont réellement stockées physiquement sur le support de stockage utilisé dans le système de gestion de base de données. Il a peu de rapport avec la façon dont les données semblent être stockées (par exemple, la vue logique)."
+
+https://fr.differbetween.com/article/difference_between_logical_and_physical_data_model#what_is_the_difference_between_logical_and_physical_views_of_a_database
+
+
+3 Est-ce que cette requête génère une erreur ? Et si la vue house_student_count avait été une
+table normale, est-ce que cette requête aurait fonctionné ?
+
+la requête génère une erreur
+
+14:21:58	UPDATE house_student_count SET student_count = 10 WHERE house_name = 'Gryffondor'	Error Code: 1288. The target table house_student_count of the UPDATE is not updatable	0.000 sec
+
+Il ne faut pas confondre les vues et la base de donné. La vue n'est qu'un visualisation de la donné et non pas la donné elle même.
+Les vues sont destinées à être des représentations en lecture seule des données.
+
+
+La requête peut fonctionner avec une table normale. mais il faut que la colonne student_count soit défini et modifiable:
+
+CREATE TABLE house_student_count (
+    house_name VARCHAR(255),
+    student_count INT
+);
+
+-> insérer des valeurs puis :
+
+UPDATE house_student_count
+SET student_count = 10
+WHERE house_name = 'Gryffondor';
