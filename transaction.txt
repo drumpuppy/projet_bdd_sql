@@ -1,0 +1,23 @@
+1. Expliquer ce qu'est une transaction en base de données.
+
+Une transaction de base de données est une série d'une ou plusieurs opérations exécutées comme une seule unité de travail atomique. 
+
+Cela signifie que soit toutes les opérations de la transaction sont effectuées avec succès, soit aucune d'entre elles n'est appliquée à la base de données. 
+
+Les transactions sont utilisées pour assurer la cohérence et l'intégrité des données en garantissant que la base de données reste cohérente même en cas de défaillances ou d'erreurs du système. 
+
+La principale caractéristique des transactions de base de données est qu'elles sont atomiques, cohérentes, isolées et durables (ACID). 
+Il s'agit des quatre propriétés clés qui garantissent la fiabilité de la base de données.
+
+
+2. Présenter les propriétés ACID des transactions.
+
+Les propriétés ACID sont un ensemble de propriétés qui assurent la fiabilité des transactions de base de données. Ces propriétés sont :
+
+Atomicité: Cette propriété garantit qu'une transaction est traitée comme une unité de travail unique et indivisible. Cela signifie que soit toutes les opérations de la transaction sont effectuées avec succès, soit aucune d'entre elles n'est appliquée à la base de données. En cas d'échec, la base de données est ramenée à son état antérieur à la transaction, ce qui permet de maintenir la cohérence.
+
+Cohérence: Cette propriété garantit que la base de données reste dans un état cohérent tout au long de la transaction. Le SGBD vérifie les contraintes d'intégrité avant et après la transaction et annule la transaction si une contrainte est violée.
+
+Isolation: Cette propriété garantit que les modifications apportées par une transaction ne sont pas visibles par les autres transactions jusqu'à ce que la transaction soit validée. Cette isolation permet d'éviter les conflits entre les transactions concurrentes.
+
+Durabilité: Cette propriété garantit que les modifications apportées par une transaction sont permanentes et survivent à toute défaillance ultérieure. Le SGBD utilise une technique appelée journalisation pour garantir que les modifications apportées par une transaction peuvent être annulées en cas d'échec.
