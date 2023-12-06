@@ -1,0 +1,27 @@
+1. Cette base de données n'est pas normalisée. En effet, il n'y a pas de clef primaire permettant d'identifier de façon unique chaque étudiant. De plus, il y a de la redondance de données. Par exemple, pour chaque cours enregistré, le nom de l'étudiant, l'email, l'année, la maison et le préfet sont répétés.
+
+2. DF : student_name -> email, registered_course, year, house, prefect 
+registered_course -> student_name, email, house, prefect
+house -> student_name, email, registered_course, year, prefect
+prefect -> student_name, email, registered_course, year, house
+
+1FN est respecté car toutes les données sont atomiques.
+2FN n'est pas respecté car il y a une redondance des données.
+2FN n'étant pas respecté, la 3FN n'est donc pas non plus respecté.
+
+3. Pour normaliser la bdd, il faut créer des tables suppémenataires : students, registered_courses, houses, prefects. La table students contiendrait les champs student_name, email, year. La table registered_courses contiendrait les champs course_name, student_name (en tant que clé étrangère). La table Houses contiendrait les champs house_name et student_name (en tant que clé étrangère). Enfin, la table Prefects contiendrait les champs prefect_name et house_name (en tant que clé étrangère).
+
+4. MCD dans le folder
+
+
+5. studens(id_studens, studens_name, email, year)
+House(id_house, house_name, #id_studens)
+Prefects(id_prefect, prefect_name, #house_name)
+Registered_courses(id_course, course_name, #id_students)
+
+6. 
+
+//TODO
+
+7. Dans normalisation.sql
+
