@@ -15,28 +15,36 @@ l'intégralité de la table (un scan complet) pour trouver les données pertinen
 
 -- a) compter le nombre d'étudiants qui sont dans la maison "Gryffindor" ;
 
-
-SELECT COUNT(*) as nombre_etudiants FROM etudiants WHERE house = 'Gryffondor';
-
+SELECT COUNT(*) AS Gryffindor_Student_Count
+FROM students
+JOIN houses ON students.id_house = houses.id_house
+WHERE houses.house_name = 'Gryffindor';
 
 -- b) mesurer le temps de la requête avec la commande SHOW PROFILE
+
 SET profiling = 1;
-SELECT COUNT(*) FROM etudiants WHERE house = 'Gryffondor';
-SHOW PROFILE;
+SELECT COUNT(*) AS Gryffindor_Student_Count
+FROM students
+JOIN houses ON students.id_house = houses.id_house
+WHERE houses.house_name = 'Gryffindor';
+SHOW PROFILES;
+
 
 -- c) ajouter un index sur la colonne "house_id" de la table "students" ;
-CREATE INDEX idx_house_id ON etudiants (house_id);
+
+CREATE INDEX idx_house_id ON students(id_house);
 
 -- d) mesurer à nouveau le temps de la requête après l'ajout de l'index ;
-SELECT COUNT(*) FROM etudiants WHERE house = 'Gryffindor';
-SHOW PROFILE;
+
+DROP INDEX idx_house_id ON students;
+SELECT COUNT(*) AS Gryffindor_Student_Count
+FROM students
+JOIN houses ON students.id_house = houses.id_house
+WHERE houses.house_name = 'Gryffindor';
+SHOW PROFILES;
 
 -- e) mesurer à nouveau le temps de la requête mais sans index.
-SELECT COUNT(*) FROM etudiants IGNORE INDEX (idx_house_id) WHERE house = 'Gryffindor';
 
-SET profiling = 1;
-SELECT COUNT(*) FROM etudiants IGNORE INDEX (idx_house_id) WHERE house = 'Gryffindor';
-SHOW PROFILE;
 
 /* 3. Pour les requêtes suivantes, vous devez dire à quoi correspond chaque requête.
 Ensuite, vous devez mesurer le temps de la requête, rajouter un index, mesurer encore
@@ -45,16 +53,34 @@ une fois le temps de la requête*/
 
 -- Requête a
 
+-- à quoi elle sert
+
+
+SET profiling = 1;
 SELECT houses.house_name, courses.course_name, COUNT(*) AS num_students
 FROM students
 JOIN houses ON students.house_id = houses.house_id
 JOIN courses ON students.course_id = courses.course_id
 GROUP BY houses.house_name, courses.course_name
 ORDER BY num_students DESC;
+SHOW PROFILES;
+
+
+
+CREATE INDEX idx_house_course ON students(house_id, course_id);
+SELECT houses.house_name, courses.course_name, COUNT(*) AS num_students
+FROM students
+JOIN houses ON students.house_id = houses.house_id
+JOIN courses ON students.course_id = courses.course_id
+GROUP BY houses.house_name, courses.course_name
+ORDER BY num_students DESC;
+SHOW PROFILES;
+
+
 
 -- Requête b
-
 SELECT student_name, email FROM students WHERE course_id IS NULL;
+
 
 -- Requête c
 SELECT houses.house_name, COUNT(*) AS num_students FROM students
