@@ -7,6 +7,10 @@ CREATE VIEW potion_students_view AS SELECT student_name, email, house FROM etudi
 SELECT * FROM potion_students_view;
 
 -- c. Rajouter 2 étudiants qui suivent un cours de potion.
+
+-- TODO
+
+
 INSERT INTO etudiants (student_name, email, registered_course, year, house, prefect)
 VALUES ('Marie', 'marie@poudlard.edu', 'potion', 3.0, 'Gryffondor', 'Godrick'),
        ('Loic', 'loic@poudlard.edu', 'potion', 1.0, 'Serdaigle', 'Help');

@@ -5,7 +5,7 @@
 SHOW TABLES;
 
 -- b. Afficher les colonnes de la table "project"
-SHOW COLUMNS FROM project;
+SHOW COLUMNS FROM etudiants;
 
 -- c. Le nombre d'étudiants dans la base de données
 SELECT COUNT(*) as nombre_étudiant FROM etudiants;
