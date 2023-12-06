@@ -67,6 +67,9 @@ FROM etudiants e
 JOIN students s ON e.student_name = s.student_name AND e.email = s.email
 JOIN courses c ON e.registered_course = c.course_name;
 
+-- Ajout de la colonne 'registered_course' à la table 'students'
+ALTER TABLE students
+ADD COLUMN registered_course VARCHAR(255);
 
 -- Supprimer la table 'etudiants' si tout est correct
 -- DROP TABLE etudiants;
