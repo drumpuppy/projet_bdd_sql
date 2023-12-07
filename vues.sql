@@ -32,6 +32,9 @@ SELECT * FROM view_students_potions;
 -- 3. Modification interdite d'une vue :
 
 -- Créer une vue house_student_count qui regroupe les étudiants par maison et compte le nombre d'étudiants dans chaque maison.
+DROP VIEW IF EXISTS house_student_count;
+
+
 CREATE VIEW house_student_count AS
 SELECT h.house_name, COUNT(s.id_student) AS student_count
 FROM houses h LEFT JOIN students s ON h.id_house = s.id_house 

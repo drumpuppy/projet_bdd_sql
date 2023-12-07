@@ -53,12 +53,9 @@ ON DUPLICATE KEY UPDATE id_student = id_student;
 -- Insérer les préfets après que 'houses' ait été peuplée
 INSERT INTO prefects (prefect_name, id_house)
 SELECT 
-    DISTINCT e.prefect, 
-    h.id_house
-FROM 
-    etudiants e
-JOIN 
-    houses h ON e.house = h.house_name;
+    DISTINCT e.prefect, h.id_house
+FROM etudiants e
+JOIN houses h ON e.house = h.house_name;
 
 -- Insérer les inscriptions après que 'students' et 'courses' aient été peuplés
 INSERT IGNORE INTO registrations (id_student, id_course)
@@ -66,10 +63,6 @@ SELECT s.id_student, c.id_course
 FROM etudiants e
 JOIN students s ON e.student_name = s.student_name AND e.email = s.email
 JOIN courses c ON e.registered_course = c.course_name;
-
--- Ajout de la colonne 'registered_course' à la table 'students'
-ALTER TABLE students
-ADD COLUMN registered_course VARCHAR(255);
 
 -- Supprimer la table 'etudiants' si tout est correct
 -- DROP TABLE etudiants;
