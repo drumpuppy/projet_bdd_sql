@@ -5,10 +5,20 @@ VALUES ('Lily Rogue', 'lily.rogue@poudlard.edu', 2, 1);
 SELECT * FROM students WHERE student_name = 'Lily Rogue';
 ROLLBACK;
 
+-- COMMIT; 
+-- je commit pour créer l'élève pour la question où il faut changer un cours d'un élève
+
 -- Vérification pour confirmer que l'étudiant n'a pas été ajouté de manière permanente
 SELECT * FROM students WHERE student_name = 'Lily Rogue';
 
 ########################################################
+-- je vais utiliser ce student pour le changement de cours
+START TRANSACTION;
+INSERT INTO students (student_name, email, year, id_house)
+VALUES ('Louise Rogue', 'louise.rogue@poudlard.edu', 1, 3);
+SELECT * FROM students WHERE student_name = 'Louise Rogue';
+COMMIT; 
+
 -- 4. Modification multiple et commit :
 SET SQL_SAFE_UPDATES = 0;
 START TRANSACTION;
@@ -19,18 +29,26 @@ SET id_house = 2
 WHERE student_name = 'Aiden Ortiz';
 
 -- Mise à jour du cours d'un autre étudiant
-UPDATE students
-SET registered_course = 'botanique'
-WHERE student_name = 'Penelope Price';
+UPDATE registrations
+SET id_course = (SELECT id_course FROM courses WHERE id_course = 1)
+WHERE id_student = (SELECT id_student FROM students WHERE student_name = 'Louise Rogue');
 
--- Vérification des modifications dans la base de données
-SELECT * FROM students WHERE student_name IN ('Aiden Ortiz', 'Penelope Price');
+-- Vérifiez la mise à jour de la maison de l'étudiant 'Aiden Ortiz'.
+SELECT * FROM students WHERE student_name = 'Aiden Ortiz';
+
+SELECT * FROM students;
+SELECT * FROM registrations;
+-- Vérifiez la mise à jour du cours de l'étudiant 'Louise Rogue'.
+SELECT * FROM registrations WHERE id_student = (SELECT id_student FROM students WHERE student_name = 'Louise Rogue');
 
 -- Validation des modifications
 COMMIT;
 
 -- Vérification pour confirmer que les modifications sont permanentes
-SELECT * FROM students WHERE student_name IN ('Aiden Ortiz', 'Penelope Price');
+SELECT * FROM students WHERE student_name IN ('Aiden Ortiz');
+
+SELECT * FROM registrations
+WHERE id_student = (SELECT id_student FROM students WHERE student_name = 'Louise Rogue');
 
 ########################################################
 -- 5. Transaction avec erreur et rollback
@@ -49,6 +67,5 @@ VALUES ('Owen Wood', 'owen.wood@poudlard.edu', 1, 3);
 
 -- Annulation de toutes les opérations
 ROLLBACK;
-
 
 SET SQL_SAFE_UPDATES = 1;
