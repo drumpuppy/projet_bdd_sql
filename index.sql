@@ -15,35 +15,49 @@ l'intégralité de la table (un scan complet) pour trouver les données pertinen
 
 -- a) compter le nombre d'étudiants qui sont dans la maison "Gryffindor" ;
 
-SELECT COUNT(*) AS Gryffindor_Student_Count
-FROM students
-JOIN houses ON students.id_house = houses.id_house
-WHERE houses.house_name = 'Gryffindor';
+SELECT COUNT(*) 
+FROM students 
+JOIN houses ON students.id_house = houses.id_house 
+WHERE houses.house_name = 'Gryffondor';
+
 
 -- b) mesurer le temps de la requête avec la commande SHOW PROFILE
 
 SET profiling = 1;
-SELECT COUNT(*) AS Gryffindor_Student_Count
-FROM students
-JOIN houses ON students.id_house = houses.id_house
-WHERE houses.house_name = 'Gryffindor';
-SHOW PROFILES;
+SELECT COUNT(*) 
+FROM students 
+JOIN houses ON students.id_house = houses.id_house 
+WHERE houses.house_name = 'Gryffondor';
+SHOW PROFILES; -- 0.00105025
+
 
 
 -- c) ajouter un index sur la colonne "house_id" de la table "students" ;
 
-CREATE INDEX idx_house_id ON students(id_house);
+CREATE INDEX idx_id_house ON students(id_house);
 
 -- d) mesurer à nouveau le temps de la requête après l'ajout de l'index ;
 
-DROP INDEX idx_house_id ON students;
-SELECT COUNT(*) AS Gryffindor_Student_Count
-FROM students
-JOIN houses ON students.id_house = houses.id_house
-WHERE houses.house_name = 'Gryffindor';
-SHOW PROFILES;
+SET profiling = 1;
+
+SELECT COUNT(*) 
+FROM students 
+JOIN houses ON students.id_house = houses.id_house 
+WHERE houses.house_name = 'Gryffondor';
+
+SHOW PROFILES; -- 0.00045850
+
 
 -- e) mesurer à nouveau le temps de la requête mais sans index.
+
+SET profiling = 1;
+
+SELECT COUNT(*) 
+FROM students IGNORE INDEX (idx_id_house)
+JOIN houses ON students.id_house = houses.id_house 
+WHERE houses.house_name = 'Gryffondor';
+
+SHOW PROFILES; -- 0.00103450
 
 
 /* 3. Pour les requêtes suivantes, vous devez dire à quoi correspond chaque requête.
@@ -53,62 +67,145 @@ une fois le temps de la requête*/
 
 -- Requête a
 
--- à quoi elle sert
+/*
+Cette requête a pour but de compter le nombre d'étudiants par maison et par cours, 
+en regroupant les données par nom de maison et nom de cours,
+puis en les triant par le nombre d'étudiants en ordre décroissant.
+*/
 
-
+-- mesure sans index
 SET profiling = 1;
+
 SELECT houses.house_name, courses.course_name, COUNT(*) AS num_students
 FROM students
-JOIN houses ON students.house_id = houses.house_id
-JOIN courses ON students.course_id = courses.course_id
+JOIN houses ON students.id_house = houses.id_house
+JOIN registrations ON students.id_student = registrations.id_student
+JOIN courses ON registrations.id_course = courses.id_course
 GROUP BY houses.house_name, courses.course_name
 ORDER BY num_students DESC;
-SHOW PROFILES;
+
+SHOW PROFILES; -- select in 0.00277350
 
 
+-- mesure avec index
+CREATE INDEX idx_house_course ON registrations(id_student, id_course);
 
-CREATE INDEX idx_house_course ON students(house_id, course_id);
 SELECT houses.house_name, courses.course_name, COUNT(*) AS num_students
 FROM students
-JOIN houses ON students.house_id = houses.house_id
-JOIN courses ON students.course_id = courses.course_id
+JOIN houses ON students.id_house = houses.id_house
+JOIN registrations ON students.id_student = registrations.id_student
+JOIN courses ON registrations.id_course = courses.id_course
 GROUP BY houses.house_name, courses.course_name
 ORDER BY num_students DESC;
-SHOW PROFILES;
 
+SHOW PROFILES; -- select in 0.00089225
 
 
 -- Requête b
-SELECT student_name, email FROM students WHERE course_id IS NULL;
+
+/* 
+Cette requête sélectionne les noms et les emails des étudiants qui ne sont inscrits dans aucun cours (course_id IS NULL).
+*/
+
+-- mesure sans index
+SET profiling = 1;
+SELECT s.student_name, s.email
+FROM students s
+LEFT JOIN registrations r ON s.id_student = r.id_student
+WHERE r.id_student IS NULL;
+SHOW PROFILES; -- 0.00077150
+
+-- mesure avec index
+
+CREATE INDEX idx_registration_student ON registrations(id_student);
+SELECT s.student_name, s.email
+FROM students s
+LEFT JOIN registrations r ON s.id_student = r.id_student
+WHERE r.id_student IS NULL;
+SHOW PROFILES; -- 0.00053700
 
 
 -- Requête c
-SELECT houses.house_name, COUNT(*) AS num_students FROM students
-JOIN houses ON students.house_id = houses.house_id
+
+/*
+Cette requête compte le nombre d'étudiants 
+par maison pour les maisons ayant des étudiants inscrits aux cours 'Potions', 'Sortilèges', ou 'Botanique'.
+*/
+
+-- mesure sans index
+SET profiling = 1;
+SELECT houses.house_name, COUNT(*) AS num_students
+FROM students
+JOIN houses ON students.id_house = houses.id_house
+JOIN registrations ON students.id_student = registrations.id_student
 WHERE EXISTS (
-SELECT * FROM courses WHERE course_name IN ('Potions', 'Sortilèges', 'Botanique')
-AND course_id = students.course_id
+    SELECT * FROM courses
+    WHERE course_name IN ('Potions', 'Sortilèges', 'Botanique')
+    AND id_course = registrations.id_course
 )
- GROUP BY houses.house_name;
+GROUP BY houses.house_name;
+SHOW PROFILES; -- 0.00079925
+
+-- mesure avec index
+CREATE INDEX idx_course_name ON courses(course_name);
+SELECT houses.house_name, COUNT(*) AS num_students
+FROM students
+JOIN houses ON students.id_house = houses.id_house
+JOIN registrations ON students.id_student = registrations.id_student
+WHERE EXISTS (
+    SELECT * FROM courses
+    WHERE course_name IN ('Potions', 'Sortilèges', 'Botanique')
+    AND id_course = registrations.id_course
+)
+GROUP BY houses.house_name;
+SHOW PROFILES; -- 0.00154350
+
 
 
 -- Requête d
-SELECT s.student_name, s.email FROM students s
+
+/*
+Cette requête trouve les étudiants qui ont suivi tous les cours disponibles 
+pour leur année d'étude, en comparant le nombre de cours distincts suivis 
+par chaque étudiant avec le nombre total de cours disponibles pour cette année.
+*/
+
+-- mesure sans index
+SET profiling = 1;
+SELECT s.student_name, s.email
+FROM students s
 JOIN (
-SELECT student_id, year_id, COUNT(DISTINCT course_id) AS
-num_courses
-FROM students
-GROUP BY student_id, year_id
+    SELECT id_student, COUNT(DISTINCT id_course) AS num_courses
+    FROM registrations
+    GROUP BY id_student
 ) AS sub
-ON s.student_id = sub.student_id AND s.year_id = sub.year_id
+ON s.id_student = sub.id_student
 JOIN (
-SELECT year_id, COUNT(DISTINCT course_id) AS num_courses
-FROM students
-GROUP BY year_id
+    SELECT COUNT(DISTINCT id_course) AS total_courses
+    FROM courses
 ) AS total
-ON s.year_id = total.year_id AND sub.num_courses =
-total.num_courses
-WHERE sub.num_courses = total.num_courses;
+ON sub.num_courses = total.total_courses
+WHERE sub.num_courses = total.total_courses;
+SHOW PROFILES; -- 0.00081500
+
+-- mesure avec les index
+CREATE INDEX idx_student_course ON registrations(id_student, id_course);
+SELECT s.student_name, s.email
+FROM students s
+JOIN (
+    SELECT id_student, COUNT(DISTINCT id_course) AS num_courses
+    FROM registrations
+    GROUP BY id_student
+) AS sub
+ON s.id_student = sub.id_student
+JOIN (
+    SELECT COUNT(DISTINCT id_course) AS total_courses
+    FROM courses
+) AS total
+ON sub.num_courses = total.total_courses
+WHERE sub.num_courses = total.total_courses;
+SHOW PROFILES; -- 0.00062675
+
 
 
 
