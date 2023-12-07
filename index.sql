@@ -205,9 +205,3 @@ JOIN (
 ON sub.num_courses = total.total_courses
 WHERE sub.num_courses = total.total_courses;
 SHOW PROFILES; -- 0.00062675
-
-
-
-
-
-

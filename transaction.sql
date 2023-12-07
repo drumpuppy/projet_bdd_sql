@@ -17,6 +17,7 @@ START TRANSACTION;
 INSERT INTO students (student_name, email, year, id_house)
 VALUES ('Louise Rogue', 'louise.rogue@poudlard.edu', 1, 3);
 SELECT * FROM students WHERE student_name = 'Louise Rogue';
+INSERT INTO registrations (id_student, id_course) VALUES (32, 2); -- 32 : from previous select
 COMMIT; 
 
 -- 4. Modification multiple et commit :
