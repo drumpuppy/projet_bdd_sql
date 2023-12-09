@@ -1,3 +1,6 @@
+
+--                                                      ETAPE 1
+
 -- Drop tables if they exist (for clean setup)
 DROP TABLE IF EXISTS registrations, prefects, students, courses, houses;
 
@@ -47,8 +50,6 @@ SELECT DISTINCT e.student_name, e.email, e.year, h.id_house
 FROM etudiants e
 JOIN houses h ON e.house = h.house_name
 ON DUPLICATE KEY UPDATE id_student = id_student;
-
-
 
 -- Insérer les préfets après que 'houses' ait été peuplée
 INSERT INTO prefects (prefect_name, id_house)

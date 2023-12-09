@@ -20,7 +20,6 @@ FROM students
 JOIN houses ON students.id_house = houses.id_house 
 WHERE houses.house_name = 'Gryffondor';
 
-
 -- b) mesurer le temps de la requête avec la commande SHOW PROFILE
 
 SET profiling = 1;
@@ -30,8 +29,6 @@ JOIN houses ON students.id_house = houses.id_house
 WHERE houses.house_name = 'Gryffondor';
 SHOW PROFILES; -- 0.00105025
 
-
-
 -- c) ajouter un index sur la colonne "house_id" de la table "students" ;
 
 CREATE INDEX idx_id_house ON students(id_house);
@@ -39,31 +36,25 @@ CREATE INDEX idx_id_house ON students(id_house);
 -- d) mesurer à nouveau le temps de la requête après l'ajout de l'index ;
 
 SET profiling = 1;
-
 SELECT COUNT(*) 
 FROM students 
 JOIN houses ON students.id_house = houses.id_house 
 WHERE houses.house_name = 'Gryffondor';
-
 SHOW PROFILES; -- 0.00045850
-
 
 -- e) mesurer à nouveau le temps de la requête mais sans index.
 
 SET profiling = 1;
-
 SELECT COUNT(*) 
 FROM students IGNORE INDEX (idx_id_house)
 JOIN houses ON students.id_house = houses.id_house 
 WHERE houses.house_name = 'Gryffondor';
-
 SHOW PROFILES; -- 0.00103450
 
 
 /* 3. Pour les requêtes suivantes, vous devez dire à quoi correspond chaque requête.
 Ensuite, vous devez mesurer le temps de la requête, rajouter un index, mesurer encore
 une fois le temps de la requête*/
-
 
 -- Requête a
 
@@ -75,7 +66,6 @@ puis en les triant par le nombre d'étudiants en ordre décroissant.
 
 -- mesure sans index
 SET profiling = 1;
-
 SELECT houses.house_name, courses.course_name, COUNT(*) AS num_students
 FROM students
 JOIN houses ON students.id_house = houses.id_house
@@ -83,7 +73,6 @@ JOIN registrations ON students.id_student = registrations.id_student
 JOIN courses ON registrations.id_course = courses.id_course
 GROUP BY houses.house_name, courses.course_name
 ORDER BY num_students DESC;
-
 SHOW PROFILES; -- select in 0.00277350
 
 
@@ -97,7 +86,6 @@ JOIN registrations ON students.id_student = registrations.id_student
 JOIN courses ON registrations.id_course = courses.id_course
 GROUP BY houses.house_name, courses.course_name
 ORDER BY num_students DESC;
-
 SHOW PROFILES; -- select in 0.00089225
 
 

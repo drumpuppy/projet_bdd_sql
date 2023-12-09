@@ -6,7 +6,7 @@ Cela signifie que soit toutes les opérations de la transaction sont effectuées
 
 Les transactions sont utilisées pour assurer la cohérence et l'intégrité des données en garantissant que la base de données reste cohérente même en cas de défaillances ou d'erreurs du système. 
 
-La principale caractéristique des transactions de base de données est qu'elles sont atomiques, cohérentes, isolées et durables (ACID). 
+La principale caractéristique des transactions de base de données est qu'elles sont atomiques, cohérentes, isolées et durables (ACID).
 Il s'agit des quatre propriétés clés qui garantissent la fiabilité de la base de données.
 
 

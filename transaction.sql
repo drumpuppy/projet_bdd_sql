@@ -1,12 +1,12 @@
+
+--                                                      ETAPE 2
+
 -- 3. Ajout d'un étudiant et rollback :
 START TRANSACTION;
 INSERT INTO students (student_name, email, year, id_house)
 VALUES ('Lily Rogue', 'lily.rogue@poudlard.edu', 2, 1);
 SELECT * FROM students WHERE student_name = 'Lily Rogue';
 ROLLBACK;
-
--- COMMIT; 
--- je commit pour créer l'élève pour la question où il faut changer un cours d'un élève
 
 -- Vérification pour confirmer que l'étudiant n'a pas été ajouté de manière permanente
 SELECT * FROM students WHERE student_name = 'Lily Rogue';
@@ -17,8 +17,9 @@ START TRANSACTION;
 INSERT INTO students (student_name, email, year, id_house)
 VALUES ('Louise Rogue', 'louise.rogue@poudlard.edu', 1, 3);
 SELECT * FROM students WHERE student_name = 'Louise Rogue';
-INSERT INTO registrations (id_student, id_course) VALUES (32, 2); -- 32 : from previous select
+INSERT INTO registrations (id_student, id_course) VALUES (33, 2); 
 COMMIT; 
+
 
 -- 4. Modification multiple et commit :
 SET SQL_SAFE_UPDATES = 0;
@@ -37,8 +38,6 @@ WHERE id_student = (SELECT id_student FROM students WHERE student_name = 'Louise
 -- Vérifiez la mise à jour de la maison de l'étudiant 'Aiden Ortiz'.
 SELECT * FROM students WHERE student_name = 'Aiden Ortiz';
 
-SELECT * FROM students;
-SELECT * FROM registrations;
 -- Vérifiez la mise à jour du cours de l'étudiant 'Louise Rogue'.
 SELECT * FROM registrations WHERE id_student = (SELECT id_student FROM students WHERE student_name = 'Louise Rogue');
 

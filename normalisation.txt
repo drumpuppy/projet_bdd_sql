@@ -19,20 +19,29 @@ prefect -> student_name, email, registered_course, year, house
 3. Proposer une normalisation du schéma. Expliquer les modifications apportées pour
 normaliser le schéma.
 
-Pour normaliser la bdd, il faut créer des tables supplémentaires : students, registered_courses, houses, prefects. 
-La table students contiendrait les champs student_name, email, year. 
-La table registered_courses contiendrait les champs course_name, student_name (en tant que clé étrangère). 
-La table Houses contiendrait les champs house_name et student_name (en tant que clé étrangère). Enfin, la table Prefects contiendrait les champs prefect_name et house_name (en tant que clé étrangère).
+Pour normaliser la bdd, il faut créer des tables supplémentaires : 
+
+La table « houses » contient les maisons avec un identifiant unique (id_house) et un nom de maison unique (house_name).
+
+La table « courses » contient les cours avec un identifiant unique (id_course) et un nom de cours unique (course_name).
+
+La table « students » contient les étudiants avec un identifiant unique (id_student), un nom d'étudiant (student_name), un email unique, une année d'étude (year), et une clé étrangère (id_house) liée à la table « houses ».
+
+La table « registrations » représente les inscriptions des étudiants aux cours. Elle a une clé primaire composée des identifiants d'étudiant et de cours (id_student, id_course), avec des clés étrangères liées aux tables « students » et « courses ».
+
+La table « prefects » contient les préfets avec un identifiant unique (id_prefect), un nom de préfet (prefect_name), et une clé étrangère (id_house) liée à la table « houses ».
+
 
 4. Faire le MCD du schéma normalisé.
 MCD dans le folder
 
 5. Faire le MLD du schéma normalisé.
 
-Students(id_student, student_name, email, year)
-House(id_house, house_name, #id_student)
-Prefects(id_prefect, prefect_name, #house_name)
-Registered_courses(id_course, course_name, #id_student)
+Students(id_student, student_name, email, year, #id_house)
+Houses(id_house, house_name)
+Prefects(id_prefect, prefect_name, #id_house)
+Registrations(#id_course, #id_students)
+Courses(#id_courses, course_name)
 
 6. Commande pour sauvegarder la base de données
 mysqldump [OPTIONS] ma_base_de_donnee [ma_table1, ma_table2,...]
